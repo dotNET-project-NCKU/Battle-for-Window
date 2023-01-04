@@ -18,8 +18,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     private void Start()
     {
-        //StartGame(GameMode.AutoHostOrClient);
-        StartGame(GameMode.Single);
+        StartGame(GameMode.AutoHostOrClient);
+        //StartGame(GameMode.Single);
     }
 
     async void StartGame(GameMode mode)

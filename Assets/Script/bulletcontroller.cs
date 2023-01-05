@@ -22,7 +22,6 @@ public class bulletcontroller : MonoBehaviour
         if(collision.transform.tag == "Enemy")
         {
             collision.transform.GetComponent<zombieController>().TakeDamage(damageAmount);
-
         }
     }
 }

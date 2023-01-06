@@ -2,13 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Fusion;
 
-public class zombieController : MonoBehaviour
+public class zombieController : NetworkBehaviour
 {
-    public float HP = 100;
-    public Slider healthBar;
-    public Animator animator;
+    [SerializeField]
+    public int Hp = 100;
+    [SerializeField]
+    private int maxHp = 100;
+
+    public Animator networkAnimator;
+    [SerializeField]
+    private Image hpBar = null;
     //public GameObject Coins;
+
+    public void Start()
+    {
+        //networkAnimator = GetComponentInChildren<NetworkMecanimAnimator>();
+        Hp = maxHp;
+        Debug.Log("hp init");
+    }
 
     private void Update()
     {
@@ -17,12 +30,17 @@ public class zombieController : MonoBehaviour
 
     public void TakeDamage(int damageAmount)
     {
-        HP -= damageAmount;
-        if (HP <= 0)
+        Hp -= damageAmount;
+        OnHpChanged();
+        if (Hp <= 0)
         {
-            animator.SetTrigger("die");
+            networkAnimator.SetTrigger("die");
             //GetComponent<Collider>().enabled = false;
             
         }
+    }
+    private void OnHpChanged()
+    {
+        hpBar.fillAmount = (float)Hp / maxHp;
     }
 }

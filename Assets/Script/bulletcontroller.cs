@@ -1,28 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
-public class bulletcontroller : MonoBehaviour
+public class BulletController : NetworkBehaviour
 {
-    // Start is called before the first frame update
-    public int damageAmount = 3;
-    private void Start()
+    [Networked]
+    private TickTimer life { get; set; }
+    [SerializeField]
+    private float bulletSpeed = 5f;
+    public override void Spawned()
     {
-        
+        life = TickTimer.CreateFromSeconds(Runner, 5.0f);
     }
-    private void Awake()
+    public override void FixedUpdateNetwork()
     {
-        //Destroy(gameObject, life);
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        //Destroy(collision.gameObject);
-        Debug.Log("bullet collision");
-        Destroy(gameObject);
-        if(collision.transform.tag == "Enemy")
+        if (life.Expired(Runner))
         {
-            collision.transform.GetComponent<zombieController>().TakeDamage(damageAmount);
+            Runner.Despawn(Object);
+        }
+        else
+        {
+            transform.position += bulletSpeed * transform.forward * Runner.DeltaTime;
+        }
 
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            var zombie = other.GetComponent<zombieController>();
+            zombie.TakeDamage(10);
+            Runner.Despawn(Object);
         }
     }
 }

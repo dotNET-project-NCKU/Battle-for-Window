@@ -1254,6 +1254,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   networkCharacterController: {fileID: 1815632423317003876}
   moveSpeed: 15
+  runSpeed: 25
   rescueDistance: 2
   maxHp: 100
   run: 0
@@ -1327,7 +1328,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   Animator: {fileID: 9179836423444069397}
-  TotalWords: 2
+  TotalWords: 3
   SyncSettings: 79
   FloatAccuracy:
     _value: 0
@@ -1341,7 +1342,7 @@ MonoBehaviour:
     _value: 0
     _inverse: 0
     _hash: -814817977
-  StateHashes: 000000003d105000d6631fcbee43def25e241edce1202d4562543e72
+  StateHashes: 000000003d105000d6631fcbee43def25e241edce1202d4562543e72befc447025a681d7
   TriggerHashes: 00000000
 --- !u!1 &9179836423968266927
 GameObject:

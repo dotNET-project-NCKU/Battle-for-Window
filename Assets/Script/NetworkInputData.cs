@@ -15,4 +15,5 @@ public struct NetworkInputData : INetworkInput
 {
     public NetworkButtons buttons;
     public Vector3 movementInput;
+    public Vector3 rotationInput;
 }

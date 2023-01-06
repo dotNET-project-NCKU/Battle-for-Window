@@ -37,8 +37,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        //Vector3 spawnPosition = new Vector3(20, 1, 23);
-        Vector3 spawnPosition = Vector3.up * 2;
+        Vector3 spawnPosition = new Vector3(20, 3, 74);
+        //Vector3 spawnPosition = Vector3.up * 2;
         NetworkObject networkPlayerObject = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
 
         playerList.Add(player, networkPlayerObject);
@@ -68,6 +68,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
         if (Input.GetKey(KeyCode.D))
             data.movementInput += Vector3.right;
+        data.rotationInput.x = Input.GetAxis("Mouse X");
+        data.rotationInput.y = 0;
         data.buttons.Set(InputButtons.FIRE, Input.GetKey(KeyCode.Mouse0));
         data.buttons.Set(InputButtons.RUN, Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.W));
         data.buttons.Set(InputButtons.WALK, Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D));

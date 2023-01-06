@@ -9,11 +9,14 @@ public class PlayerController2 : NetworkBehaviour
     [SerializeField]
     private NetworkCharacterControllerPrototype networkCharacterController = null;
 
-    /*[SerializeField]
-    private Bullet bulletPrefab;
+    [SerializeField]
+    private BulletController bulletPrefab;
 
     [SerializeField]
-    private Image hpBar = null;*/
+    private Transform muzzle;
+
+    [SerializeField]
+    private Image hpBar = null;
 
     [SerializeField]
     private float moveSpeed = 15f;
@@ -29,11 +32,12 @@ public class PlayerController2 : NetworkBehaviour
 
     [SerializeField]
     bool run = false;
+    [SerializeField]
+    float mouseSensitivity = 4f;
 
     public bool falldown = false;
 
-    /*[Networked(OnChanged = nameof(OnHpChanged))]*/
-    [Networked] 
+    [Networked]
     public int Hp { get; set; }
     [Networked]
     private NetworkMecanimAnimator networkAnimator { get; set; }
@@ -65,31 +69,74 @@ public class PlayerController2 : NetworkBehaviour
             var pressed = buttons.GetPressed(ButtonPrevious);
             ButtonPrevious = buttons;
             Vector3 moveVector = data.movementInput.normalized;
+            Debug.Log(transform.rotation * moveVector);
             //Debug.Log(pressed);
+            
+            float mouse_dx = Input.GetAxis("Mouse X");
+            float mouse_dy = Input.GetAxis("Mouse Y") * -1;
+            /*
+            if (Input.GetMouseButton(1))
+            {
+                if (Mathf.Abs(mouse_dx) > 0 || Mathf.Abs(mouse_dy) > 0)
+                {
+                    // get the camera eular angle 
+                    Vector3 currentCameraAngle = transform.rotation.eulerAngles;
+
+                    currentCameraAngle.x = Mathf.Repeat(currentCameraAngle.x + 180f, 360f) - 180f;       // always true 0 ~ 180
+                    currentCameraAngle.y += mouse_dx;                       // unity yaw Y, right is positive, left i negative
+                    currentCameraAngle.x -= mouse_dy;                       // unity pitch X, up is negative, down is positive
+
+                    Quaternion cameraRotation = Quaternion.identity;
+                    cameraRotation.eulerAngles = new Vector3(currentCameraAngle.x, currentCameraAngle.y, 0);
+                    //transform.rotation = cameraRotation;
+                    networkCharacterController.WriteRotation(cameraRotation);
+
+                }
+            }*/
+
+
             if (!falldown)
             {
                 //networkCharacterController.Move(moveSpeed * moveVector * Runner.DeltaTime);
+                //Debug.Log(Quaternion.AngleAxis(mouseSensitivity * Input.GetAxis("Mouse X") * Runner.DeltaTime, Vector3.up));
+                //networkCharacterController.WriteRotation(Quaternion.AngleAxis(mouseSensitivity * Input.GetAxis("Mouse X") * Runner.DeltaTime, Vector3.up));
+
+
+                //networkCharacterController.TeleportToRotation(new Quaternion(0, mouseSensitivity * Input.GetAxis("Mouse X"), 0, Space.Self);
+                //networkCharacterController.Transform.Rotate(0, mouseSensitivity * Input.GetAxis("Mouse X"), 0, Space.Self);
+                networkCharacterController.Rotate(data.rotationInput.x);
+
+
                 if (pressed.IsSet(InputButtons.FIRE))
                 {
-                    /*Runner.Spawn(
+                    Runner.Spawn(
                         bulletPrefab,
-                        transform.position + transform.TransformDirection(Vector3.forward),
+                        muzzle.position + transform.TransformDirection(Vector3.forward),
                         Quaternion.LookRotation(transform.TransformDirection(Vector3.forward)),
-                        Object.InputAuthority);*/
+                        Object.InputAuthority);
                     networkAnimator.Animator.SetBool("shoot", true);
                 }else if (buttons.IsSet(InputButtons.RUN))
                 {
                     networkAnimator.Animator.SetBool("run", true);
-                    networkCharacterController.Move(runSpeed * moveVector * Runner.DeltaTime);
+                    
+                    //* moveVector
+                    //networkCharacterController.TeleportToPosition(runSpeed * moveVector * Runner.DeltaTime, interpolateBackwards: false);
+                    //networkCharacterController.Transform.Translate(runSpeed * moveVector * Runner.DeltaTime);
+                    networkCharacterController.Move(runSpeed * (transform.rotation * moveVector) * Runner.DeltaTime);
                 }
                 else if(buttons.IsSet(InputButtons.WALK))
                 {
                     networkAnimator.Animator.SetBool("run", true);
-                    networkCharacterController.Move(moveSpeed * moveVector * Runner.DeltaTime);
+                    //networkCharacterController.TeleportToPosition(moveSpeed * moveVector * Runner.DeltaTime, interpolateBackwards: false);
+                    //networkCharacterController.Transform.Translate(moveSpeed * moveVector * Runner.DeltaTime);
+                    networkCharacterController.Move(moveSpeed * (transform.rotation * moveVector) * Runner.DeltaTime);
+                    
                 }
                 else
                 {
                     networkAnimator.Animator.SetBool("run", false);
+                    //networkCharacterController.TeleportToPosition(moveSpeed * moveVector * Runner.DeltaTime, interpolateBackwards: false);
+                    //networkCharacterController.Transform.Translate(moveSpeed * moveVector * Runner.DeltaTime);
                     networkCharacterController.Move(moveSpeed * moveVector * Runner.DeltaTime);
                 }
                 
@@ -144,17 +191,19 @@ public class PlayerController2 : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             Hp -= damage;
+            //OnHpChanged();
         }
     }
 
     private void Update()
     {
-        ;
+        if(Object.HasInputAuthority)
+            hpBar.fillAmount = (float)Hp / maxHp;
     }
 
-    /*private static void OnHpChanged(Changed<PlayerController> changed)
+    /*private void OnHpChanged()
     {
-        changed.Behaviour.hpBar.fillAmount = (float)changed.Behaviour.Hp / changed.Behaviour.maxHp;
+        hpBar.fillAmount = (float)Hp / maxHp;
     }*/
 
 }
